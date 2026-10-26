@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>The Microsoft AI Platform Advantage · A Cinematic Decision Guide</title>
+<style>
+:root{
+  --bg:#03040b; --ink:#f4f6ff; --muted:#a7b0cf; --line:rgba(255,255,255,.12); --card:rgba(255,255,255,.055);
+  --c1:#00A4EF; --c2:#7C4FE0; --c3:#22d3ee;
+  --ms-red:#F25022; --ms-green:#7FBA00; --ms-blue:#00A4EF; --ms-yellow:#FFB900;
+  --font:"Segoe UI Variable Display","Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: light){ :root{ --bg:#03040b; } }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden}
+body{transition:background-color 1.2s}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.aura{position:fixed;inset:-20%;z-index:0;pointer-events:none;transition:opacity 1.2s;
+  background:radial-gradient(45% 40% at 20% 20%,color-mix(in srgb,var(--c1) 38%,transparent),transparent 70%),
+             radial-gradient(40% 40% at 85% 80%,color-mix(in srgb,var(--c2) 38%,transparent),transparent 70%);
+  animation:auraMove 18s ease-in-out infinite alternate}
+@keyframes auraMove{to{transform:translate(4%,-3%) rotate(6deg) scale(1.08)}}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%,transparent 55%,rgba(0,0,0,.7))}
+
+/* ---------- fixed 16:9 stage, scaled to fit: no scrolling ---------- */
+.viewport{position:fixed;inset:0;z-index:2;overflow:hidden}
+.deck{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:center center;transform:translate(-50%,-50%)}
+.scene{position:absolute;inset:0;padding:70px 96px 120px;display:flex;flex-direction:column;justify-content:center;visibility:hidden;opacity:0;pointer-events:none}
+.scene.active{visibility:visible;opacity:1;pointer-events:auto}
+.scene.active{animation:var(--in,zoomIn) 1.1s cubic-bezier(.2,.8,.2,1) both}
+.scene.leaving{visibility:visible;opacity:1;animation:var(--out,zoomOut) .8s cubic-bezier(.5,0,.75,0) both}
+.scene[data-fx="zoom"]{--in:zoomIn;--out:zoomOut}
+.scene[data-fx="slide"]{--in:slideIn;--out:slideOut}
+.scene[data-fx="rise"]{--in:riseIn;--out:riseOut}
+.scene[data-fx="warp"]{--in:warpIn;--out:warpOut}
+.scene[data-fx="flip"]{--in:flipIn;--out:flipOut}
+.scene[data-fx="iris"]{--in:irisIn;--out:fadeOut}
+.back .scene[data-fx="slide"]{--in:slideInB;--out:slideOutB}
+@keyframes zoomIn{from{opacity:0;transform:scale(.82);filter:blur(14px)}to{opacity:1;transform:none;filter:none}}
+@keyframes zoomOut{to{opacity:0;transform:scale(1.25);filter:blur(16px)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(240px) skewX(-6deg)}to{opacity:1;transform:none}}
+@keyframes slideOut{to{opacity:0;transform:translateX(-240px) skewX(6deg)}}
+@keyframes slideInB{from{opacity:0;transform:translateX(-240px) skewX(6deg)}to{opacity:1;transform:none}}
+@keyframes slideOutB{to{opacity:0;transform:translateX(240px) skewX(-6deg)}}
+@keyframes riseIn{from{opacity:0;transform:translateY(160px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes riseOut{to{opacity:0;transform:translateY(-160px) scale(.96)}}
+@keyframes warpIn{from{opacity:0;transform:perspective(1200px) translateZ(-900px) rotateX(18deg);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+@keyframes warpOut{to{opacity:0;transform:perspective(1200px) translateZ(700px);filter:blur(12px)}}
+@keyframes flipIn{from{opacity:0;transform:perspective(1600px) rotateY(-55deg) translateX(120px)}to{opacity:1;transform:none}}
+@keyframes flipOut{to{opacity:0;transform:perspective(1600px) rotateY(55deg) translateX(-120px)}}
+@keyframes irisIn{from{opacity:0;clip-path:circle(0% at 50% 50%)}to{opacity:1;clip-path:circle(80% at 50% 50%)}}
+@keyframes fadeOut{to{opacity:0}}
+
+/* staged reveals */
+.r{opacity:0}
+.scene.active .r{animation:rUp .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--d,0) * .22s + .45s)}
+.scene.active .r.l{animation-name:rLeft}.scene.active .r.rt{animation-name:rRight}.scene.active .r.pop{animation-name:rPop}
+@keyframes rUp{from{opacity:0;transform:translateY(38px)}to{opacity:1;transform:none}}
+@keyframes rLeft{from{opacity:0;transform:translateX(-80px)}to{opacity:1;transform:none}}
+@keyframes rRight{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:none}}
+@keyframes rPop{0%{opacity:0;transform:scale(.6)}70%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:none}}
+
+/* type */
+.kick{display:inline-flex;align-items:center;gap:12px;font-size:16px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;color:var(--c3);margin-block-end:18px}
+.kick::before{content:"";width:34px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--c1),var(--c2))}
+h1{font-size:104px;line-height:.98;font-weight:800;letter-spacing:-.035em}
+h2{font-size:62px;line-height:1.04;font-weight:800;letter-spacing:-.025em;margin-block-end:16px;max-width:1300px}
+.lead{font-size:24px;line-height:1.45;color:var(--muted);max-width:1180px}
+.g{background:linear-gradient(95deg,var(--c1),var(--c2) 55%,var(--c3));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% 100%;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:200% 0}}
+.small{font-size:15px;color:var(--muted);line-height:1.45}
+.note{font-size:13px;color:var(--muted);opacity:.8;margin-block-start:18px;max-width:1300px;line-height:1.45}
+
+/* layout */
+.row{display:grid;gap:20px;margin-block-start:34px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}.c5{grid-template-columns:repeat(5,1fr)}.c6{grid-template-columns:repeat(6,1fr)}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px 24px;backdrop-filter:blur(10px);overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(140deg,color-mix(in srgb,var(--c1) 70%,transparent),transparent 40%,transparent 60%,color-mix(in srgb,var(--c2) 70%,transparent));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.card h3{font-size:24px;line-height:1.2;margin-block-end:8px}
+.card p{font-size:17px;line-height:1.45;color:var(--muted)}
+.card .lab{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--c3);font-weight:700;margin-block-end:10px}
+.card .foot{font-size:14px;color:var(--ink);opacity:.85;margin-block-start:12px;line-height:1.4}
+.card .foot b{color:var(--c3)}
+.card.hot{background:linear-gradient(150deg,color-mix(in srgb,var(--c1) 26%,transparent),color-mix(in srgb,var(--c2) 22%,transparent))}
+.scene.active .card.sheen::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.14) 50%,transparent 65%);transform:translateX(-120%);animation:sheen 1.6s ease forwards;animation-delay:calc(var(--d,0) * .22s + 1s)}
+@keyframes sheen{to{transform:translateX(120%)}}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:16px}
+.chipline{display:flex;gap:12px;flex-wrap:wrap;margin-block-start:26px}
+.callout{margin-block-start:28px;font-size:21px;line-height:1.45;padding:18px 24px;border-radius:16px;border-inline-start:4px solid var(--c1);background:color-mix(in srgb,var(--c1) 10%,transparent);max-width:1300px}
+.callout b{color:var(--c3)}
+.quote{font-size:34px;line-height:1.3;font-weight:600;max-width:1250px;margin-block-start:30px}
+.quote small{display:block;font-size:16px;color:var(--muted);font-weight:400;margin-block-start:12px}
+
+/* big numbers */
+.big{font-size:76px;font-weight:800;line-height:1;letter-spacing:-.03em;background:linear-gradient(95deg,var(--c1),var(--c3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat p{margin-block-start:10px}
+
+/* hero */
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-block-start:46px}
+.mslogo{display:inline-grid;grid-template-columns:1fr 1fr;gap:4px;width:38px;height:38px;margin-inline-end:14px;vertical-align:middle}
+.mslogo i{display:block}
+.brand{display:flex;align-items:center;font-size:22px;font-weight:600;margin-block-end:34px}
+
+/* questions */
+.qs{display:flex;flex-direction:column;gap:18px;margin-block-start:36px}
+.q{display:flex;align-items:center;gap:26px;font-size:34px;font-weight:600;padding:22px 30px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.q .n{font-size:22px;font-weight:800;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--c1),var(--c2));flex:none}
+
+/* gravity wells */
+.wells{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:30px;align-items:center;margin-block-start:30px}
+.well{display:flex;flex-direction:column;align-items:center;text-align:center}
+.orbit{position:relative;display:grid;place-items:center;margin-block-end:22px}
+.orbit .core{border-radius:50%;display:grid;place-items:center;font-weight:800;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c3) 80%,white),var(--c1) 45%,var(--c2));box-shadow:0 0 80px color-mix(in srgb,var(--c1) 70%,transparent)}
+.orbit .ring{position:absolute;border:1px dashed rgba(255,255,255,.25);border-radius:50%;animation:spin 14s linear infinite}
+.orbit .ring::after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;background:var(--c3);inset-block-start:-6px;inset-inline-start:calc(50% - 6px);box-shadow:0 0 14px var(--c3)}
+.orbit .ring.r2{animation-duration:22s;animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.well.small-well .core{background:radial-gradient(circle at 35% 30%,#9aa,#455 60%,#223);box-shadow:none}
+.well h3{font-size:22px;margin-block-end:8px}
+.well p{font-size:16px;color:var(--muted);line-height:1.45;max-width:420px}
+.scene.active .core{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.05)}}
+
+/* 20/80 split */
+.split{display:grid;grid-template-columns:1fr 4fr;gap:20px;margin-block-start:34px;height:360px}
+.blk{border-radius:24px;padding:26px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
+.blk .pct{font-size:96px;font-weight:800;line-height:1}
+.blk h3{font-size:26px}
+.blk ul{list-style:none;font-size:17px;line-height:1.7;color:rgba(255,255,255,.85)}
+.blk.s{background:rgba(255,255,255,.07);border:1px solid var(--line)}
+.blk.u{background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 30px 80px color-mix(in srgb,var(--c2) 40%,transparent)}
+.blk.u ul{columns:2}
+.scene.active .blk{animation:growW 1.4s cubic-bezier(.2,.8,.2,1) both}
+.scene.active .blk.u{animation-delay:.6s}
+@keyframes growW{from{clip-path:inset(0 100% 0 0 round 24px)}to{clip-path:inset(0 0 0 0 round 24px)}}
+
+/* versus */
+.vs{display:grid;grid-template-columns:1fr 90px 1fr;gap:0;align-items:stretch;margin-block-start:28px}
+.vs .mid{display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--muted)}
+.vs .card ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-block-start:12px}
+.vs .card li{font-size:17px;line-height:1.35;padding-inline-start:28px;position:relative;color:var(--ink)}
+.vs .good li::before{content:"✓";position:absolute;inset-inline-start:0;color:var(--ms-green);font-weight:800}
+.vs .meh li::before{content:"→";position:absolute;inset-inline-start:0;color:var(--muted)}
+.vs .meh li{color:var(--muted)}
+.vs .card h3{font-size:34px}
+
+/* journey */
+.journey{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-block-start:34px;position:relative}
+.journey::before{content:"";position:absolute;inset-inline:40px;inset-block-start:38px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3));transform:scaleX(0);transform-origin:left}
+.scene.active .journey::before{animation:sx 2.2s .6s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes sx{to{transform:scaleX(1)}}
+.stp .dot{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;font-size:30px;font-weight:800;background:#0b0f22;border:3px solid var(--c1);position:relative;z-index:1;margin-block-end:18px;box-shadow:0 0 30px color-mix(in srgb,var(--c1) 60%,transparent)}
+.stp:nth-child(2) .dot{border-color:var(--c2)}.stp:nth-child(3) .dot{border-color:var(--c3)}
+.stp .when{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--c3);font-weight:700}
+.stp h3{font-size:34px;margin-block:6px 8px}
+.stp p{font-size:17px;color:var(--muted);line-height:1.45}
+.stp .prod{display:inline-block;margin-block-start:12px;font-size:14px;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--c1) 22%,transparent)}
+.chain{display:flex;align-items:center;gap:14px;margin-block-start:34px;flex-wrap:nowrap}
+.chain .lk{padding:16px 26px;border-radius:16px;font-size:22px;font-weight:700;background:var(--card);border:1px solid var(--line)}
+.chain .ar{font-size:26px;color:var(--c3)}
+.scene.active .chain .lk{animation:pulseB 3s ease-in-out infinite;animation-delay:calc(var(--d,0) * .3s + 2s)}
+@keyframes pulseB{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 2px var(--c3),0 0 30px color-mix(in srgb,var(--c3) 60%,transparent)}}
+
+/* agents */
+.agent .ic{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-size:28px;margin-block-end:16px;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.agent .for{font-size:15px;color:var(--c3);font-weight:600;margin-block-end:10px}
+.recall{margin-block-start:28px;font-size:22px;text-align:center;color:var(--muted)}
+.recall b{color:var(--ink)}
+
+/* customer zero tiles */
+.cz{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-block-start:30px}
+.cz .card{padding:20px 22px}
+.cz .v{font-size:50px;font-weight:800;line-height:1;background:linear-gradient(95deg,var(--c1),var(--c3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.cz .fn{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--c3);font-weight:700;margin-block:10px 6px}
+
+/* bars */
+.bars{display:flex;flex-direction:column;gap:24px;margin-block-start:36px;max-width:1300px}
+.bar-row{display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:center}
+.bar-row .lab{font-size:22px;font-weight:600}
+.tracks{display:flex;flex-direction:column;gap:8px}
+.track{height:28px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;position:relative}
+.fill{height:100%;width:0;border-radius:inherit;display:flex;align-items:center;justify-content:flex-end;padding-inline-end:12px;font-size:15px;font-weight:700;transition:width 1.8s cubic-bezier(.2,.8,.2,1)}
+.fill.f{background:linear-gradient(90deg,var(--c1),var(--c3))}
+.fill.l{background:rgba(255,255,255,.28);color:#111}
+.legend{display:flex;gap:26px;font-size:16px;color:var(--muted);margin-block-start:10px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-inline-end:8px;vertical-align:-2px}
+
+/* trust */
+.trust-top{display:grid;grid-template-columns:330px 1fr;gap:40px;align-items:center;margin-block-start:20px}
+.ring-big{width:300px;height:300px;position:relative}
+.ring-big svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-big .lbl{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring-big .lbl b{font-size:80px;font-weight:800;display:block;line-height:1}
+.ring-big circle.p{stroke-dasharray:0 1000;transition:stroke-dasharray 2s cubic-bezier(.2,.8,.2,1)}
+.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.principles .card{padding:18px 20px}
+.principles .card h3{font-size:20px}
+.principles .card p{font-size:15px}
+
+/* bottom line */
+.pillars{display:flex;gap:14px;margin-block-start:40px;flex-wrap:wrap}
+.pillars .pill{font-size:21px;padding:14px 26px;background:linear-gradient(135deg,color-mix(in srgb,var(--c1) 35%,transparent),color-mix(in srgb,var(--c2) 35%,transparent));border-color:color-mix(in srgb,var(--c1) 60%,transparent)}
+
+/* layers */
+.layers{display:flex;flex-direction:column;gap:12px;margin-block-start:26px}
+.layer{display:grid;grid-template-columns:240px 380px 1fr;gap:24px;align-items:center;padding:17px 26px;border-radius:16px;background:var(--card);border:1px solid var(--line);border-inline-start:5px solid var(--lc,var(--c1))}
+.layer .t{font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--lc,var(--c3))}
+.layer .p{font-size:20px;font-weight:700}
+.layer .d{font-size:16px;color:var(--muted);line-height:1.4}
+
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-block-start:34px}
+.flow .card{border-radius:0;margin-inline-end:-1px}
+.flow .card:first-child{border-start-start-radius:22px;border-end-start-radius:22px}
+.flow .card:last-child{border-start-end-radius:22px;border-end-end-radius:22px}
+.flow .card .st{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--c3);font-weight:700}
+.flow .card h3{font-size:28px;margin-block:8px}
+
+/* decision */
+.dec .card h3{font-size:30px}
+.dec .card:nth-child(1){--c1:#7FBA00;--c3:#a3e635}
+.dec .card:nth-child(2){--c1:#FFB900;--c3:#fcd34d}
+.dec .card:nth-child(3){--c1:#F25022;--c3:#fb923c}
+.dec .verb{font-size:56px;font-weight:800;color:var(--c1);line-height:1;margin-block-end:12px}
+
+/* chapters / final */
+.chapter-num{font-size:220px;font-weight:800;line-height:.8;opacity:.12;position:absolute;inset-inline-end:90px;inset-block-start:90px;letter-spacing:-.05em}
+.links{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-block-start:34px}
+.links a{color:var(--ink);text-decoration:none;font-size:17px;padding:14px 18px;border-radius:14px;background:var(--card);border:1px solid var(--line);transition:background .3s,transform .3s}
+.links a:hover{background:color-mix(in srgb,var(--c1) 25%,transparent);transform:translateY(-3px)}
+
+/* ---------- HUD ---------- */
+.hud{position:fixed;inset-inline:0;inset-block-end:0;z-index:6;padding:10px 26px 16px;background:linear-gradient(0deg,rgba(3,4,11,.92),rgba(3,4,11,0))}
+.cap{max-width:1100px;margin:0 auto 10px;text-align:center;font-size:16px;line-height:1.5;color:#e6ebff;min-height:24px;text-shadow:0 2px 12px #000;transition:opacity .4s}
+.ctl{display:flex;align-items:center;gap:10px;max-width:1500px;margin:0 auto}
+.ctl button{font:inherit;font-size:14px;height:36px;min-width:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);cursor:pointer}
+.ctl button:hover{background:rgba(255,255,255,.18)}
+.ctl button.on{background:var(--c1);border-color:var(--c1);color:#fff}
+.prog{flex:1;display:flex;gap:3px;align-items:center}
+.prog span{flex:1;height:5px;border-radius:5px;background:rgba(255,255,255,.14);overflow:hidden;cursor:pointer;transition:height .2s}
+.prog span:hover{height:9px}
+.prog span i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--c1),var(--c3))}
+.prog span.done i{width:100%}
+.cnt{font-size:13px;color:var(--muted);min-width:56px;text-align:end;font-variant-numeric:tabular-nums}
+.chap{font-size:13px;color:var(--c3);letter-spacing:.14em;text-transform:uppercase;font-weight:700;min-width:150px}
+.menu{position:fixed;inset-block-end:76px;inset-inline-end:26px;z-index:7;background:rgba(10,12,28,.96);border:1px solid var(--line);border-radius:16px;padding:10px;display:none;max-height:70vh;overflow:auto;width:340px}
+.menu.open{display:block}
+.menu button{display:flex;gap:12px;width:100%;text-align:start;font:inherit;font-size:14px;color:var(--ink);background:transparent;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+.menu button:hover,.menu button.cur{background:rgba(255,255,255,.08)}
+.menu button em{font-style:normal;color:var(--muted);min-width:24px}
+.menu h4{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--c3);padding:10px 12px 4px}
+
+/* gate */
+.gate{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;background:radial-gradient(60% 55% at 50% 45%,rgba(0,164,239,.25),transparent 70%),radial-gradient(40% 40% at 70% 70%,rgba(124,79,224,.25),transparent 70%),#03040b;transition:opacity 1s,transform 1s}
+.gate.hide{opacity:0;transform:scale(1.15);pointer-events:none}
+.gate .t{font-size:14px;letter-spacing:.4em;text-transform:uppercase;color:#22d3ee;font-weight:700}
+.gate h1{font-size:clamp(38px,6vw,84px);max-width:1200px;padding-inline:20px}
+.gate .go{width:104px;height:104px;border-radius:50%;border:0;cursor:pointer;background:conic-gradient(from 0deg,#F25022,#FFB900,#7FBA00,#00A4EF,#7C4FE0,#F25022);display:grid;place-items:center;animation:spin 6s linear infinite;box-shadow:0 0 70px rgba(0,164,239,.6)}
+.gate .go span{width:88px;height:88px;border-radius:50%;background:#03040b;display:grid;place-items:center;animation:spin 6s linear infinite reverse}
+.gate .go svg{width:34px;height:34px;fill:#fff;margin-inline-start:6px}
+.gate .opts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.gate .opts button{font:inherit;font-size:15px;color:#c9d2f0;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:10px 20px;cursor:pointer}
+.gate .opts button:hover{background:rgba(255,255,255,.14)}
+.gate small{font-size:13px;color:var(--muted)}
+
+/* flash on chapter change */
+.flash{position:fixed;inset:0;z-index:5;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--c1) 55%,transparent),transparent 60%)}
+.flash.go{animation:flash 1.1s ease}
+@keyframes flash{30%{opacity:.9}100%{opacity:0}}
+.chapter-toast{position:fixed;inset-block-start:26px;inset-inline-start:50%;transform:translateX(-50%) translateY(-20px);z-index:6;font-size:13px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;padding:10px 22px;border-radius:999px;background:rgba(0,0,0,.5);border:1px solid var(--line);color:var(--c3);opacity:0;transition:all .6s}
+.chapter-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="aura" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="flash" id="flash" aria-hidden="true"></div>
+<div class="chapter-toast" id="toast" aria-hidden="true"></div>
+
+<div class="gate" id="gate">
+  <div class="t">A cinematic story &amp; decision guide</div>
+  <h1>The advantage isn't the model.<br><span class="g" style="--c1:#00A4EF;--c2:#7C4FE0;--c3:#22d3ee">It's the platform.</span></h1>
+  <button class="go" id="start" type="button" aria-label="Play with narration"><span><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span></button>
+  <div class="opts">
+    <button type="button" id="startSilent">Play without narration</button>
+    <button type="button" id="startManual">Click through at my own pace</button>
+  </div>
+  <small>← → to move · Space to pause · M for chapters</small>
+</div>
+
+<div class="viewport"><div class="deck" id="deck">
+
+<!-- ================= CHAPTER 1 · THE STORY ================= -->
+<section class="scene" data-fx="iris" data-ch="The Story" data-theme="#00A4EF,#7C4FE0,#22d3ee"
+ data-say="Every vendor can rent access to a great AI model. Only one platform already holds the data, the trust, and the everyday surfaces where work happens. The advantage isn't the model. It's the platform.">
+  <div class="brand r" style="--d:0"><span class="mslogo"><i style="background:#F25022"></i><i style="background:#7FBA00"></i><i style="background:#00A4EF"></i><i style="background:#FFB900"></i></span>Microsoft &nbsp;|&nbsp; AI Platform Story</div>
+  <h1 class="r" style="--d:1">The advantage isn't the model.<br><span class="g">It's the platform.</span></h1>
+  <p class="lead r" style="--d:3;margin-block-start:26px">Only one platform already holds the data, the trust, and the everyday surfaces where work happens. That turns AI from a feature into a business advantage that keeps growing.</p>
+  <div class="hero-stats">
+    <div class="card stat r pop" style="--d:5"><div class="big" data-count="75" data-suf="%">0</div><p>of knowledge workers already use AI at work</p></div>
+    <div class="card stat r pop" style="--d:6"><div class="big" data-count="3.5" data-pre="$" data-dec="1">0</div><p>return for every $1 invested in AI</p></div>
+    <div class="card stat r pop" style="--d:7"><div class="big" data-count="1.3" data-suf="B" data-dec="1">0</div><p>AI agents projected in use by 2028</p></div>
+    <div class="card stat r pop" style="--d:8"><div class="big" data-count="80" data-suf="%+">0</div><p>of enterprise context already lives inside Microsoft 365</p></div>
+  </div>
+</section>
+
+<section class="scene" data-fx="slide" data-ch="The Shift" data-theme="#00A4EF,#22d3ee,#7FBA00"
+ data-say="Every enterprise is asking the same question. Where should our AI agents actually live? It's really three questions. Which platform has the data my agents need? Which one will my employees use every day? And which one avoids the highest integration tax?">
+  <div class="kick r">The Shift</div>
+  <h2 class="r" style="--d:1">"Where should our AI agents <span class="g">actually live?"</span></h2>
+  <p class="lead r" style="--d:2">Every CIO, CTO and Chief AI Officer is wrestling with this question. It's really three questions in one.</p>
+  <div class="qs">
+    <div class="q r l" style="--d:4"><span class="n">01</span>Which platform has the data my agents will actually need?</div>
+    <div class="q r l" style="--d:6"><span class="n">02</span>Which platform will my employees actually use, every single day?</div>
+    <div class="q r l" style="--d:8"><span class="n">03</span>Which platform avoids the highest integration tax?</div>
+  </div>
+</section>
+
+<section class="scene" data-fx="zoom" data-ch="The Shift" data-theme="#00A4EF,#22d3ee,#7FBA00"
+ data-say="The momentum is real. Three quarters of knowledge workers use AI at work, nearly double in six months. Eighty-two percent of organizations plan to integrate agents within three years. Three questions, one underlying constraint: data.">
+  <div class="kick r">The Shift</div>
+  <h2 class="r" style="--d:1">The momentum is <span class="g">already here</span></h2>
+  <div class="row c4" style="margin-block-start:50px">
+    <div class="card stat r pop sheen" style="--d:2"><div class="big" data-count="75" data-suf="%">0</div><p>of knowledge workers use AI at work, nearly double in six months</p></div>
+    <div class="card stat r pop sheen" style="--d:3"><div class="big" data-count="82" data-suf="%">0</div><p>of organizations plan to integrate agents within 1–3 years</p></div>
+    <div class="card stat r pop sheen" style="--d:4"><div class="big" data-count="1.3" data-suf="B" data-dec="1">0</div><p>AI agents projected in use by 2028</p></div>
+    <div class="card stat r pop sheen" style="--d:5"><div class="big" data-count="40" data-suf="%">0</div><p>of enterprise apps expected to embed task-specific agents by 2026</p></div>
+  </div>
+  <div class="callout r" style="--d:8">Three questions, one underlying constraint: <b>data.</b></div>
+</section>
+
+<section class="scene" data-fx="warp" data-ch="Data Gravity" data-theme="#7C4FE0,#00A4EF,#c084fc" data-bh="1"
+ data-say="In 2010, Dave McCrory coined the term data gravity. As data accumulates, it gets harder to move, so applications are pulled toward the data. For AI agents, that pull is stronger than ever. Six forces build on each other wherever agents operate.">
+  <div class="kick r">The Physics of AI</div>
+  <h2 class="r" style="--d:1">Data gravity decides where <span class="g">agents can live</span></h2>
+  <p class="lead r" style="--d:2">As data piles up, it gets harder to move, so services are pulled toward the data. Agents reason over data continuously, hold context across sessions and work across formats. The platform with the richest, most connected and most deeply indexed data has the edge.</p>
+  <div class="row c6" style="margin-block-start:34px">
+    <div class="card r pop" style="--d:4"><div class="lab">Force 1</div><h3>Volume</h3><p>More data means better retrieval and richer reasoning context.</p></div>
+    <div class="card r pop" style="--d:5"><div class="lab">Force 2</div><h3>Variety</h3><p>Email, docs, calendar and chat together enable cross-type synthesis.</p></div>
+    <div class="card r pop" style="--d:6"><div class="lab">Force 3</div><h3>Velocity</h3><p>Real-time updates keep agents current with the business.</p></div>
+    <div class="card r pop" style="--d:7"><div class="lab">Force 4</div><h3>Connected&shy;ness</h3><p>Who-sent-what-to-whom relationships create compound intelligence.</p></div>
+    <div class="card r pop" style="--d:8"><div class="lab">Force 5</div><h3>Semantic depth</h3><p>Pre-computed embeddings and graphs, not just raw API calls.</p></div>
+    <div class="card r pop" style="--d:9"><div class="lab">Force 6</div><h3>Identity coherence</h3><p>One identity layer governs permissions, relationships and context.</p></div>
+  </div>
+  <div class="bh-anchor" aria-hidden="true" style="height:90px"></div>
+</section>
+
+<section class="scene" data-fx="zoom" data-ch="Data Gravity" data-theme="#7C4FE0,#00A4EF,#c084fc"
+ data-say="Compare the three gravity wells. The collaboration well, Microsoft 365, Copilot and WorkIQ, holds more than eighty percent of the context. CRM and ERP each hold roughly five percent. Only one well holds the data where work actually happens.">
+  <div class="kick r">Three gravitational centers</div>
+  <h2 class="r" style="--d:1">Three wells. <span class="g">Very different mass.</span></h2>
+  <div class="wells">
+    <div class="well r pop" style="--d:3">
+      <div class="orbit" style="width:330px;height:330px">
+        <div class="ring" style="width:330px;height:330px"></div><div class="ring r2" style="width:270px;height:270px"></div>
+        <div class="core" style="width:210px;height:210px;font-size:58px"><span data-count="80" data-suf="%+">0</span></div>
+      </div>
+      <h3>Collaboration well: Microsoft 365 + Copilot + WorkIQ</h3>
+      <p>Email, documents, Teams, calendar and meetings, indexed tenant-wide, with CRM and ERP arriving through Dataverse.</p>
+    </div>
+    <div class="well small-well r pop" style="--d:6">
+      <div class="orbit" style="width:200px;height:200px"><div class="ring" style="width:150px;height:150px"></div><div class="core" style="width:90px;height:90px;font-size:26px">~5%</div></div>
+      <h3>CRM well</h3><p>Structured, transactional data only, with no native view into how people actually communicate and decide.</p>
+    </div>
+    <div class="well small-well r pop" style="--d:8">
+      <div class="orbit" style="width:200px;height:200px"><div class="ring" style="width:150px;height:150px"></div><div class="core" style="width:90px;height:90px;font-size:26px">~5%</div></div>
+      <h3>ERP well</h3><p>Highly structured and narrow in scope. Powerful for operations, but blind to collaboration.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" data-fx="rise" data-ch="Data Reality" data-theme="#7C4FE0,#00A4EF,#c084fc"
+ data-say="Eighty percent of your company's intelligence was never in a database. Structured systems hold roughly a fifth of the picture. The rest lives in the everyday flow of work, and Microsoft agents run on all of it, out of the box.">
+  <div class="kick r">The Data Reality</div>
+  <h2 class="r" style="--d:1"><span class="g">80%</span> of your company's intelligence was never in a database</h2>
+  <div class="split">
+    <div class="blk s"><div><div class="pct">~20%</div><h3>Structured</h3></div><ul><li>ERP</li><li>CRM</li><li>HR systems</li><li>SQL databases</li><li>Lists &amp; project tools</li></ul></div>
+    <div class="blk u"><div><div class="pct">~80%</div><h3>Unstructured: the everyday flow of work</h3></div><ul><li>Outlook: mail &amp; calendar</li><li>Teams chats, transcripts, recordings</li><li>SharePoint &amp; OneDrive</li><li>Word, Excel, PowerPoint</li></ul></div>
+  </div>
+  <div class="callout r" style="--d:8">The real value of Microsoft agents comes from running on <b>all</b> of that data, out of the box, not just the slice that happens to be structured.</div>
+</section>
+
+<!-- ================= CHAPTER 2 · THE MOAT ================= -->
+<section class="scene" data-fx="flip" data-ch="The Moat" data-theme="#c026d3,#7C4FE0,#f0abfc"
+ data-say="Access isn't understanding. Three things build on each other to create a moat no connector can replicate: the Semantic Index, WorkIQ Memory, and Entra Identity. APIs return raw data. The Semantic Index returns intelligence.">
+  <div class="kick r">The Microsoft Moat</div>
+  <h2 class="r" style="--d:1">Access isn't <span class="g">understanding.</span></h2>
+  <div class="row c3">
+    <div class="card hot r pop sheen" style="--d:3"><div class="lab">Layer 1</div><h3>Semantic Index</h3><p>Tenant- and user-level embeddings, updated in near real time.</p></div>
+    <div class="card hot r pop sheen" style="--d:4"><div class="lab">Layer 2</div><h3>WorkIQ Memory</h3><p>A persistent understanding of how people and teams actually work.</p></div>
+    <div class="card hot r pop sheen" style="--d:5"><div class="lab">Layer 3</div><h3>Entra Identity</h3><p>A single permission and governance plane across Microsoft 365, Dynamics, Azure and agents.</p></div>
+  </div>
+  <div class="quote r" style="--d:8">"Access ≠ understanding. APIs return raw data. <span class="g">The Semantic Index returns intelligence.</span>"<small>Microsoft's own positioning on federated connectors vs. indexed data</small></div>
+</section>
+
+<section class="scene" data-fx="slide" data-ch="The Moat" data-theme="#c026d3,#7C4FE0,#f0abfc"
+ data-say="Indexed data behaves like a research librarian who has read every book and cross-referenced them. A connector behaves like a runner: it fetches exactly the book you name, and nothing more. Connectors act. Indexing understands.">
+  <div class="kick r">The librarian, not the runner</div>
+  <h2 class="r" style="--d:1">Connectors act. <span class="g">Indexing understands.</span></h2>
+  <div class="vs">
+    <div class="card hot good r l" style="--d:3"><div class="lab">The Semantic Index</div><h3>📚 The Librarian</h3>
+      <ul><li>Conceptual, vector-based matching, not keyword search</li><li>Joins email, chat, docs and CRM in one retrieval</li><li>Local-cache speed: milliseconds, not network round-trips</li><li>Natively inherits identity and permissions</li><li>Feeds a persistent, growing memory over time</li><li>Enables proactive nudges, not just answers on demand</li></ul></div>
+    <div class="mid r pop" style="--d:5">VS</div>
+    <div class="card meh r rt" style="--d:6"><div class="lab">API / MCP Connector</div><h3>🏃 The Runner</h3>
+      <ul><li>Exact-query parameters only, no conceptual match</li><li>Serial, single-purpose calls that don't compound</li><li>Subject to network latency, rate limits and throttling</li><li>Often relies on broad service accounts</li><li>Ephemeral: used once, then gone</li><li>Purely reactive: fires only when explicitly called</li></ul></div>
+  </div>
+  <p class="note r" style="--d:9;font-size:16px">Connectors are excellent for transactional actions. They are structurally limited for intelligence and reasoning, and that gap grows over time instead of closing.</p>
+</section>
+
+<!-- ================= CHAPTER 3 · THE PLATFORM ================= -->
+<section class="scene" data-fx="warp" data-ch="The Platform" data-theme="#038387,#00A4EF,#2dd4bf"
+ data-say="One platform, five capabilities no one else combines. Agent orchestration. Semantic data access. Workflow automation. Enterprise systems. And native productivity surfaces, where employees already spend their day.">
+  <div class="kick r">Why Microsoft Wins</div>
+  <h2 class="r" style="--d:1">One platform. <span class="g">Five capabilities</span> no one else combines.</h2>
+  <div class="row c5">
+    <div class="card r pop sheen" style="--d:3"><div class="lab">Copilot Studio · AI Foundry</div><h3>Agent Orchestration</h3><p>Build, deploy and govern agents that span multiple systems and workflows.</p></div>
+    <div class="card r pop sheen" style="--d:4"><div class="lab">Work IQ</div><h3>Semantic Data Access</h3><p>Unified understanding across enterprise data, with no duplication, re-indexing or data movement.</p></div>
+    <div class="card r pop sheen" style="--d:5"><div class="lab">Power Platform</div><h3>Workflow Automation</h3><p>Connects 1,000+ enterprise systems, with tools that business teams can own.</p></div>
+    <div class="card r pop sheen" style="--d:6"><div class="lab">Dataverse · Azure · Fabric</div><h3>Enterprise Systems</h3><p>A complete portfolio of business applications and data infrastructure, adopted at your pace.</p></div>
+    <div class="card r pop sheen" style="--d:7"><div class="lab">Outlook · Teams · M365</div><h3>Native Productivity Surfaces</h3><p>CRM data and AI insight appear where employees already spend their day.</p></div>
+  </div>
+  <div class="callout r" style="--d:9">No other vendor ships <b>all five</b>, end to end.</div>
+</section>
+
+<section class="scene" data-fx="rise" data-ch="The Journey" data-theme="#038387,#00A4EF,#2dd4bf"
+ data-say="The journey moves from assist, to delegate, to execute. Copilot helps people work smarter today. Cowork and agents take on complex, multi-step work. And agents and autopilots run workflows end to end. Every agent needs a model, instructions, context, memory and tools.">
+  <div class="kick r">The Journey</div>
+  <h2 class="r" style="--d:1">Assist. <span class="g">Delegate. Execute.</span></h2>
+  <p class="lead r" style="--d:2">AI in the Flow of Human Ambition (AIFHA): a staged path that puts AI into every role, with control built in at every stage so trust grows as autonomy does.</p>
+  <div class="journey">
+    <div class="stp r" style="--d:4"><div class="dot">1</div><div class="when">Today · widely deployed</div><h3>Assist</h3><p>Quick answers, drafts and summaries, created right inside Word, Excel and Teams.</p><span class="prod">M365 Copilot</span></div>
+    <div class="stp r" style="--d:6"><div class="dot">2</div><div class="when">Now scaling</div><h3>Delegate</h3><p>Multi-step plans, research and analysis, coordinated across tools by a digital coworker.</p><span class="prod">Copilot Cowork + Agents</span></div>
+    <div class="stp r" style="--d:8"><div class="dot">3</div><div class="when">Emerging</div><h3>Execute</h3><p>End-to-end process execution with proactive monitoring and action.</p><span class="prod">Agents &amp; Autopilots</span></div>
+  </div>
+  <div class="chain r" style="--d:10"><span class="small" style="font-size:18px;margin-inline-end:8px">Inside every agent:</span>
+    <span class="lk" style="--d:0">Model</span><span class="ar">→</span><span class="lk" style="--d:1">Instructions</span><span class="ar">→</span><span class="lk" style="--d:2">Context</span><span class="ar">→</span><span class="lk" style="--d:3">Memory</span><span class="ar">→</span><span class="lk" style="--d:4">Tools</span></div>
+</section>
+
+<section class="scene" data-fx="flip" data-ch="In Practice" data-theme="#038387,#00A4EF,#2dd4bf"
+ data-say="This isn't a roadmap. Four agents are available today. Researcher handles the homework. Cowork does the homework. Scout does it for you. And the Sales Agent handles the numbers.">
+  <div class="kick r">In Practice</div>
+  <h2 class="r" style="--d:1">Four agents, <span class="g">already at work</span></h2>
+  <div class="row c4">
+    <div class="card agent r pop sheen" style="--d:3"><div class="ic">🔬</div><h3>Researcher</h3><div class="for">Deep research &amp; cited briefings</div><p>Runs multi-step research across the web and your work content, then writes a structured, source-cited report.</p></div>
+    <div class="card agent r pop sheen" style="--d:4"><div class="ic">⚡</div><h3>Cowork</h3><div class="for">Fast, polished M365 work</div><p>A fast task worker for email, documents and summarization, with polished output and minimal setup.</p></div>
+    <div class="card agent r pop sheen" style="--d:5"><div class="ic">🧭</div><h3>Scout</h3><div class="for">Work beyond M365</div><p>A persistent, extensible workbench across desktop, browser, files and automations: a true cross-system control plane.</p></div>
+    <div class="card agent r pop sheen" style="--d:6"><div class="ic">📈</div><h3>Sales Agent</h3><div class="for">CRM, pipeline &amp; deals</div><p>One agentic front door for sales: account plans, deal orchestration and proactive pipeline signals from live CRM data.</p></div>
+  </div>
+  <div class="recall r" style="--d:9"><b>Researcher</b> = the homework &nbsp;·&nbsp; <b>Cowork</b> = doing the homework &nbsp;·&nbsp; <b>Scout</b> = doing it for you &nbsp;·&nbsp; <b>Sales Agent</b> = the numbers</div>
+</section>
+
+<!-- ================= CHAPTER 4 · THE PROOF ================= -->
+<section class="scene" data-fx="zoom" data-ch="The Proof" data-theme="#FFB900,#F25022,#fde047"
+ data-say="This isn't theoretical. It's already in the numbers. Copilot users save thirty minutes a day, about ten hours a month. And organizations see three and a half dollars of return for every dollar invested in AI.">
+  <div class="kick r">The Proof</div>
+  <h2 class="r" style="--d:1">This isn't theoretical. <span class="g">It's in the numbers.</span></h2>
+  <div class="row c4" style="margin-block-start:50px">
+    <div class="card stat r pop sheen" style="--d:3"><div class="big" data-count="75" data-suf="%">0</div><p>of knowledge workers use AI at work</p></div>
+    <div class="card stat r pop sheen" style="--d:4"><div class="big" data-count="30" data-suf=" min">0</div><p>saved a day by Copilot users, about 10 hours a month</p></div>
+    <div class="card stat r pop sheen" style="--d:5"><div class="big" data-count="65" data-suf="%">0</div><p>of organizations already get business value from gen AI</p></div>
+    <div class="card stat r pop sheen" style="--d:6"><div class="big" data-count="3.5" data-pre="$" data-dec="1">0</div><p>return for every $1 invested in AI</p></div>
+  </div>
+</section>
+
+<section class="scene" data-fx="slide" data-ch="Customer Zero" data-theme="#FFB900,#F25022,#fde047"
+ data-say="Microsoft runs on the same platform it sells. As Customer Zero, it's seen higher revenue per seller, faster close rates, better marketing conversion, faster case resolution, and gains across finance, HR, IT, and legal.">
+  <div class="kick r">Microsoft is Customer Zero</div>
+  <h2 class="r" style="--d:1">Functional impact of AI <span class="g">at Microsoft</span></h2>
+  <div class="cz">
+    <div class="card r pop" style="--d:2"><div class="v">+9.4%</div><div class="fn">Sales</div><p class="small">Higher revenue per seller for one business group</p></div>
+    <div class="card r pop" style="--d:3"><div class="v">+20%</div><div class="fn">Sales</div><p class="small">Faster close rates</p></div>
+    <div class="card r pop" style="--d:4"><div class="v">+21.5%</div><div class="fn">Marketing</div><p class="small">Increase in conversion rate on Azure.com</p></div>
+    <div class="card r pop" style="--d:5"><div class="v">11.5%</div><div class="fn">Customer Service</div><p class="small">Faster case resolution for Azure support</p></div>
+    <div class="card r pop" style="--d:6"><div class="v">60%</div><div class="fn">Finance</div><p class="small">Reduction in case resolution time for cash collections</p></div>
+    <div class="card r pop" style="--d:7"><div class="v">+25%</div><div class="fn">HR</div><p class="small">Greater accuracy in employee self-service</p></div>
+    <div class="card r pop" style="--d:8"><div class="v">+36%</div><div class="fn">IT</div><p class="small">Increase in self-help success rate for employees</p></div>
+    <div class="card r pop" style="--d:9"><div class="v">-5%</div><div class="fn">Legal</div><p class="small">Expected reduction in external spend for regulatory work</p></div>
+  </div>
+</section>
+
+<section class="scene" data-fx="rise" data-ch="Frontier Firms" data-theme="#FFB900,#F25022,#fde047" id="barsScene"
+ data-say="Frontier Firms pull dramatically ahead of laggards on top-line growth, brand differentiation, cost efficiency, and customer experience, by roughly four to one on every measure.">
+  <div class="kick r">Frontier Firms vs. laggards</div>
+  <h2 class="r" style="--d:1">Frontier Firms <span class="g">pull dramatically ahead</span></h2>
+  <div class="legend r" style="--d:2"><span><i style="background:linear-gradient(90deg,var(--c1),var(--c3))"></i>Frontier Firms</span><span><i style="background:rgba(255,255,255,.28)"></i>Laggards</span></div>
+  <div class="bars">
+    <div class="bar-row r l" style="--d:3"><div class="lab">Top-line growth</div><div class="tracks"><div class="track"><div class="fill f" data-w="88">88%</div></div><div class="track"><div class="fill l" data-w="23">23%</div></div></div></div>
+    <div class="bar-row r l" style="--d:4"><div class="lab">Brand differentiation</div><div class="tracks"><div class="track"><div class="fill f" data-w="87">87%</div></div><div class="track"><div class="fill l" data-w="21">21%</div></div></div></div>
+    <div class="bar-row r l" style="--d:5"><div class="lab">Cost efficiency</div><div class="tracks"><div class="track"><div class="fill f" data-w="86">86%</div></div><div class="track"><div class="fill l" data-w="21">21%</div></div></div></div>
+    <div class="bar-row r l" style="--d:6"><div class="lab">Customer experience</div><div class="tracks"><div class="track"><div class="fill f" data-w="85">85%</div></div><div class="track"><div class="fill l" data-w="23">23%</div></div></div></div>
+  </div>
+  <p class="note r" style="--d:8">Sources: Microsoft Work Trend Index (May 2024); McKinsey; IDC InfoBrief sponsored by Microsoft, "What Every Company Can Learn From Frontier Firms" (Nov. 2025); Deloitte, State of AI in the Enterprise (Jan. 2026); Gartner; Capgemini Research Institute. Figures reflect the sources cited in the underlying materials and should be reverified before external use.</p>
+</section>
+
+<!-- ================= CHAPTER 5 · TRUST ================= -->
+<section class="scene" data-fx="iris" data-ch="Responsible AI" data-theme="#7FBA00,#038387,#bef264" id="trustScene"
+ data-say="Trust isn't the brake. It's what lets you press the gas. Sixty-one percent of people say they're wary of trusting AI. That's why Microsoft builds on six Responsible AI principles, and why trust and value grow together.">
+  <div class="kick r">Responsible AI</div>
+  <h2 class="r" style="--d:1">Trust isn't the brake. <span class="g">It's what lets you press the gas.</span></h2>
+  <div class="trust-top">
+    <div class="ring-big r pop" style="--d:2">
+      <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="10"/><circle class="p" cx="60" cy="60" r="52" fill="none" stroke="url(#tg)" stroke-width="10" stroke-linecap="round"/><defs><linearGradient id="tg"><stop offset="0" stop-color="#7FBA00"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs></svg>
+      <div class="lbl"><div><b data-count="61" data-suf="%">0</b><span class="small">of people are wary<br>of trusting AI systems</span></div></div>
+    </div>
+    <div class="principles">
+      <div class="card r pop" style="--d:4"><h3>Fairness</h3><p>Treat all people fairly and avoid disparate impact.</p></div>
+      <div class="card r pop" style="--d:5"><h3>Reliability &amp; Safety</h3><p>Respond safely to the unexpected and resist manipulation.</p></div>
+      <div class="card r pop" style="--d:6"><h3>Privacy &amp; Security</h3><p>Protect data and models while preserving privacy rights.</p></div>
+      <div class="card r pop" style="--d:7"><h3>Inclusiveness</h3><p>Recognize when a conversation moves out of scope, and hand off cleanly.</p></div>
+      <div class="card r pop" style="--d:8"><h3>Transparency</h3><p>Explain decisions and provide clear documentation.</p></div>
+      <div class="card r pop" style="--d:9"><h3>Accountability</h3><p>Keep humans accountable, with oversight built in.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="scene" data-fx="flip" data-ch="Governance" data-theme="#7FBA00,#038387,#bef264"
+ data-say="Governance is built in. Agent 365 gives one registry for every agent, with an approval gate. Defender extends one security model across people and agents. And consumption dashboards give visibility into spend. Security is not the brake on AI adoption. It's the reason the next wave gets approved.">
+  <div class="kick r">Governance built in</div>
+  <h2 class="r" style="--d:1">Trust and value <span class="g">grow together</span></h2>
+  <div class="row c3">
+    <div class="card hot r pop sheen" style="--d:3"><div class="lab">Agent 365</div><h3>One registry, full visibility</h3><p>Every agent across the organization, including ones built in Foundry, shows up in one registry, with an approval gate before anything reaches users.</p></div>
+    <div class="card hot r pop sheen" style="--d:4"><div class="lab">Microsoft Defender</div><h3>One security model, not two</h3><p>Identity, access, monitoring and response in one control plane for a workforce of people and agents.</p></div>
+    <div class="card hot r pop sheen" style="--d:5"><div class="lab">Consumption dashboards</div><h3>Visibility into spend</h3><p>Admins control AI spend, so organizations don't have to choose between innovation and control.</p></div>
+  </div>
+  <div class="quote r" style="--d:8">"Security is not the brake on AI adoption; <span class="g">it's the reason the next wave gets approved.</span>"</div>
+</section>
+
+<section class="scene" data-fx="warp" data-ch="Bottom Line" data-theme="#00A4EF,#7C4FE0,#22d3ee"
+ data-say="The bottom line. Microsoft 365 is where the data already lives. Broadest data. Deepest indexing. Lowest integration burden. Highest trust. Build your AI agent layer where work already happens, and extend to everything else.">
+  <div class="kick r">The Bottom Line</div>
+  <h1 class="r" style="--d:1;font-size:92px">Microsoft 365 is where<br><span class="g">the data already lives.</span></h1>
+  <p class="lead r" style="--d:3;margin-block-start:26px;font-size:28px">Broadest data. Deepest indexing. Lowest integration burden. Highest trust. Build your AI agent layer where work already happens, and extend to everything else.</p>
+  <div class="pillars">
+    <span class="pill r pop" style="--d:5">Native data mass</span><span class="pill r pop" style="--d:6">Semantic Index</span><span class="pill r pop" style="--d:7">WorkIQ Memory</span><span class="pill r pop" style="--d:8">Entra Identity</span><span class="pill r pop" style="--d:9">Governance built in</span>
+  </div>
+</section>
+
+<!-- ================= PART 2 · DECISION GUIDE ================= -->
+<section class="scene" data-fx="iris" data-ch="Decision Guide" data-theme="#F25022,#c026d3,#fb923c"
+ data-say="The platform case is made. Now, the execution playbook. Start with the outcome. AI is a business decision before it's a technology decision. Choose where better work, stronger customer relationships, or a redesigned process can create measurable value.">
+  <div class="kick r">Part two · The Business Decision Guide</div>
+  <h1 class="r" style="--d:1;font-size:88px">Start with the outcome.<br><span class="g">Build AI advantage responsibly.</span></h1>
+  <div class="row c4">
+    <div class="card r pop sheen" style="--d:4"><div class="lab">People</div><h3>Employee experience</h3><p>Reduce routine effort and make trusted knowledge easier to use.</p></div>
+    <div class="card r pop sheen" style="--d:5"><div class="lab">Customers</div><h3>Customer engagement</h3><p>Make interactions more relevant, responsive and consistent.</p></div>
+    <div class="card r pop sheen" style="--d:6"><div class="lab">Operations</div><h3>Process redesign</h3><p>Improve handoffs, decisions and exception handling, not just tasks.</p></div>
+    <div class="card r pop sheen" style="--d:7"><div class="lab">Growth</div><h3>Innovation</h3><p>Create capacity to test ideas and develop new sources of value.</p></div>
+  </div>
+  <div class="callout r" style="--d:9"><b>The executive question:</b> Which business constraint is worth solving, and who will be accountable for the result?</div>
+</section>
+
+<section class="scene" data-fx="slide" data-ch="Decision Guide" data-theme="#F25022,#c026d3,#fb923c"
+ data-say="Make the opportunity tangible. Start with a repeatable workflow and an observable outcome. In sales, prepare better conversations. In marketing, accelerate approved content. In service, resolve with better context. And always keep a human gate.">
+  <div class="kick r">Value in the workflow</div>
+  <h2 class="r" style="--d:1">Make the opportunity <span class="g">tangible</span></h2>
+  <p class="lead r" style="--d:2">Start with a repeatable workflow and an observable outcome. These are illustrative measures to test, not promised results.</p>
+  <div class="row c3">
+    <div class="card r l" style="--d:4"><div class="lab">Sales · More selling capacity</div><h3>Prepare better conversations</h3><p>Combine account information and meeting context into a brief and a draft follow-up.</p><div class="foot"><b>Measure:</b> prep time, follow-up quality, CRM completeness, opportunity progression.</div><div class="foot"><b>Human gate:</b> the seller validates facts, commitments and messages.</div></div>
+    <div class="card r" style="--d:5"><div class="lab">Marketing · Less rework</div><h3>Accelerate approved content</h3><p>Turn an approved brief and trusted material into draft campaign assets and variants.</p><div class="foot"><b>Measure:</b> time to approved asset, revision rate, brand compliance, attributed response.</div><div class="foot"><b>Human gate:</b> the brand owner approves claims, rights and publication.</div></div>
+    <div class="card r rt" style="--d:6"><div class="lab">Service · Trusted resolution</div><h3>Resolve with better context</h3><p>Retrieve approved knowledge, summarize the case and recommend a response.</p><div class="foot"><b>Measure:</b> resolution time, repeat contacts, satisfaction, escalation quality.</div><div class="foot"><b>Human gate:</b> a responsible person handles sensitive cases.</div></div>
+  </div>
+  <div class="callout r" style="--d:8"><b>Choose the bottleneck, not the demo.</b> Apply the same value, risk and readiness tests to HR, IT, Finance and Legal.</div>
+</section>
+
+<section class="scene" data-fx="rise" data-ch="Decision Guide" data-theme="#F25022,#c026d3,#fb923c"
+ data-say="Choose how much AI may do. Assist, delegate, and execute within bounds are different operating choices. More autonomy is not automatically more value. Earn greater autonomy only when reliability, controls, and ownership justify it.">
+  <div class="kick r">Human-led by design</div>
+  <h2 class="r" style="--d:1">Choose how much <span class="g">AI may do</span></h2>
+  <p class="lead r" style="--d:2">More autonomy is not automatically more value.</p>
+  <div class="journey">
+    <div class="stp r" style="--d:4"><div class="dot">01</div><h3>Assist</h3><p>A person directs the work. AI drafts, summarizes or answers; the person reviews and decides.</p><span class="prod">Boundary: no transfer of decision authority</span></div>
+    <div class="stp r" style="--d:6"><div class="dot">02</div><h3>Delegate</h3><p>A person assigns defined tasks to agents and coordinates their contributions.</p><span class="prod">Boundary: outcome, permitted tools, review checkpoints</span></div>
+    <div class="stp r" style="--d:8"><div class="dot">03</div><h3>Execute within bounds</h3><p>Agents carry out a defined process. People set approval gates, oversee results and handle exceptions.</p><span class="prod">Boundary: constrained actions, stop conditions, fallback</span></div>
+  </div>
+  <div class="callout r" style="--d:10"><b>Earn greater autonomy:</b> expand only when measured reliability, risk controls and operational ownership justify it. People stay accountable at every level.</div>
+</section>
+
+<section class="scene" data-fx="zoom" data-ch="Decision Guide" data-theme="#F25022,#c026d3,#fb923c"
+ data-say="Make trust a condition of investment. A connected platform does not remove risk. Agree on safeguards and accountable owners for reliable outputs, privacy, safe actions, defensible decisions, adoption, and cost, before expanding access or autonomy.">
+  <div class="kick r">Risk and readiness</div>
+  <h2 class="r" style="--d:1">Make trust a <span class="g">condition of investment</span></h2>
+  <div class="row c3" style="margin-block-start:26px">
+    <div class="card r pop" style="--d:3"><h3>Reliable outputs</h3><p>Use approved knowledge, test representative cases, verify evidence.</p><div class="foot"><b>Owners:</b> business owner + CTO</div></div>
+    <div class="card r pop" style="--d:4"><h3>Privacy &amp; access</h3><p>Minimize sensitive data, review permissions, test role retrieval.</p><div class="foot"><b>Owners:</b> CIO + data and privacy leads</div></div>
+    <div class="card r pop" style="--d:5"><h3>Safe actions</h3><p>Treat retrieved content as untrusted. Restrict tools; approve high-impact actions.</p><div class="foot"><b>Owners:</b> CTO + CISO + process owner</div></div>
+    <div class="card r pop" style="--d:6"><h3>Defensible decisions</h3><p>Record decisions and approvals, define retention, review regulated uses.</p><div class="foot"><b>Owners:</b> business owner + compliance</div></div>
+    <div class="card r pop" style="--d:7"><h3>Adoption &amp; judgment</h3><p>Co-design with users, teach verification, address overreliance.</p><div class="foot"><b>Owners:</b> COO + function leader + HR</div></div>
+    <div class="card r pop" style="--d:8"><h3>Cost &amp; resilience</h3><p>Set budgets, track failures, keep fallback, rollback and incident procedures.</p><div class="foot"><b>Owners:</b> CIO + COO + Finance</div></div>
+  </div>
+</section>
+
+<section class="scene" data-fx="warp" data-ch="Platform Advantage" data-theme="#00A4EF,#038387,#22d3ee"
+ data-say="The advantage is the connection. Microsoft connects where people work, where processes run, and where business context lives, with identity and governance designed across the whole workflow.">
+  <div class="kick r">The strategic logic</div>
+  <h2 class="r" style="--d:1">The advantage is <span class="g">the connection.</span></h2>
+  <p class="lead r" style="--d:2">Connect where people work, where processes run and where business context lives, with identity and governance designed across the workflow.</p>
+  <div class="row c4">
+    <div class="card hot r pop sheen" style="--d:4"><div class="lab">Work experience</div><h3>Meet people where they work</h3><p>Bring assistance and delegation into familiar Microsoft 365 experiences.</p></div>
+    <div class="card hot r pop sheen" style="--d:5"><div class="lab">Business process</div><h3>Connect insight to action</h3><p>Use business applications and automation to improve the whole workflow.</p></div>
+    <div class="card hot r pop sheen" style="--d:6"><div class="lab">Enterprise context</div><h3>Build near useful data</h3><p>Connect business records with relevant workplace knowledge.</p></div>
+    <div class="card hot r pop sheen" style="--d:7"><div class="lab">Identity &amp; governance</div><h3>Design for controlled use</h3><p>Align access, data protection, monitoring and human accountability.</p></div>
+  </div>
+  <div class="callout r" style="--d:9"><b>The payoff:</b> fewer fragmented handoffs, less integration burden and more reusable patterns. It's a complementary portfolio, not a requirement to buy everything.</div>
+</section>
+
+<section class="scene" data-fx="slide" data-ch="Platform Advantage" data-theme="#00A4EF,#038387,#22d3ee"
+ data-say="Connect the record and the story behind it. CRM and ERP describe the business state. Email, documents, chats, and meetings explain the relationships and commitments. Retrieve to understand. Connect to act. Use both patterns deliberately.">
+  <div class="kick r">Enterprise context</div>
+  <h2 class="r" style="--d:1">Connect the record <span class="g">and the story behind it</span></h2>
+  <p class="lead r" style="--d:2">CRM and ERP describe the business state. Email, documents, chats and meetings explain the relationships, rationale and commitments.</p>
+  <div class="vs" style="margin-block-start:30px">
+    <div class="card hot r l" style="--d:4"><div class="lab">Retrieve to understand</div><h3 style="font-size:28px">Ground the answer in useful knowledge</h3><p>Search and indexed retrieval help AI find and synthesize relevant material. Design for permission-aware access, refresh schedules and evidence checks.</p><div class="foot"><b>Example:</b> retrieve meeting notes and approved product guidance for an account brief.</div></div>
+    <div class="mid r pop" style="--d:5">+</div>
+    <div class="card hot r rt" style="--d:6"><div class="lab">Connect to act</div><h3 style="font-size:28px">Read current state, make approved changes</h3><p>APIs and connectors read operational records and perform transactions. Validate inputs, permissions, approvals and failure handling.</p><div class="foot"><b>Example:</b> read the current opportunity, then propose a CRM update for seller approval.</div></div>
+  </div>
+  <div class="chipline r" style="--d:8"><span class="pill">Quality</span><span class="pill">Freshness</span><span class="pill">Connectedness</span><span class="pill">Consistent meaning</span><span class="pill">Identity &amp; access</span></div>
+</section>
+
+<section class="scene" data-fx="rise" data-ch="Platform Advantage" data-theme="#00A4EF,#038387,#22d3ee"
+ data-say="One workflow, complementary capabilities. Choose only what the outcome needs: the experience layer, business operations, data and context, build and extend, and govern and protect. Validate the end-to-end design, not just the product list.">
+  <div class="kick r">Choose the right components</div>
+  <h2 class="r" style="--d:1">One workflow. <span class="g">Complementary capabilities.</span></h2>
+  <div class="layers">
+    <div class="layer r l" style="--d:3;--lc:#00A4EF"><span class="t">Experience</span><span class="p">Microsoft 365 Copilot · Copilot Chat &amp; agents</span><span class="d">Bring assistance and task delegation into familiar work experiences.</span></div>
+    <div class="layer r l" style="--d:4;--lc:#7C4FE0"><span class="t">Business operations</span><span class="p">Dynamics 365 · Power Platform</span><span class="d">Connect customer and operational processes with apps, automation and approved actions.</span></div>
+    <div class="layer r l" style="--d:5;--lc:#22d3ee"><span class="t">Data &amp; context</span><span class="p">Work IQ · Dataverse · Fabric · Azure data</span><span class="d">Combine workplace context, structured process data and the broader data foundation.</span></div>
+    <div class="layer r l" style="--d:6;--lc:#FFB900"><span class="t">Build &amp; extend</span><span class="p">Copilot Studio · Azure / Foundry</span><span class="d">Configure business agents or engineer custom AI, with instructions, context, tools and evaluation.</span></div>
+    <div class="layer r l" style="--d:7;--lc:#7FBA00"><span class="t">Govern &amp; protect</span><span class="p">Agent 365 · Entra · Purview · Defender</span><span class="d">Agent management, identity, data protection, compliance and security.</span></div>
+  </div>
+  <p class="note r" style="--d:9">Confirm availability, licensing, tenant enablement, connector support and permissions. Benefits and control coverage depend on integration, configuration and the agents in scope. Protection is not automatic.</p>
+</section>
+
+<section class="scene" data-fx="flip" data-ch="Platform Advantage" data-theme="#00A4EF,#038387,#22d3ee"
+ data-say="Improve the journey, not just an isolated task. Marketing creates. Sales prepares. Service responds. Leaders learn. Connect them, while preserving the human checkpoints that protect customer trust. Reuse before you build.">
+  <div class="kick r">Connected business value</div>
+  <h2 class="r" style="--d:1">Improve the journey, <span class="g">not just a task</span></h2>
+  <div class="flow">
+    <div class="card r l" style="--d:3"><div class="st">01 / Attract</div><h3>Marketing creates</h3><p>Approved knowledge informs content. People verify claims and approve publication.</p></div>
+    <div class="card r l" style="--d:4"><div class="st">02 / Engage</div><h3>Sales prepares</h3><p>Account records and workplace context inform the conversation. Sellers validate commitments.</p></div>
+    <div class="card r l" style="--d:5"><div class="st">03 / Resolve</div><h3>Service responds</h3><p>Case context and trusted knowledge support resolution. People handle sensitive exceptions.</p></div>
+    <div class="card r l" style="--d:6"><div class="st">04 / Improve</div><h3>Leaders learn</h3><p>Operational data and feedback expose friction. Teams refine processes, agents and controls.</p></div>
+  </div>
+  <div class="chipline r" style="--d:8"><span class="pill"><b>Researcher:</b>&nbsp;research &amp; synthesis</span><span class="pill"><b>Cowork:</b>&nbsp;multi-step workplace work</span><span class="pill"><b>Sales-focused agents:</b>&nbsp;CRM-connected selling</span></div>
+  <div class="callout r" style="--d:9"><b>Reuse before you build.</b> Start with an available experience; extend only where the workflow requires it.</div>
+</section>
+
+<section class="scene" data-fx="warp" data-ch="Execution" data-theme="#7C4FE0,#F25022,#f0abfc"
+ data-say="Give the outcome an owner. The executive sponsor owns the value case. The line of business leader and COO own the workflow and adoption. The CIO and CTO own a reliable, supportable implementation. A center of excellence coordinates, without diluting ownership.">
+  <div class="kick r">Accountable leadership</div>
+  <h2 class="r" style="--d:1">Give the outcome <span class="g">an owner.</span></h2>
+  <div class="row c3">
+    <div class="card hot r pop sheen" style="--d:3"><div class="lab">Business sponsorship</div><h3>CEO / Executive sponsor</h3><p>Choose the strategic outcome, set principles and investment priorities, and name an accountable business owner.</p><div class="foot"><b>Own:</b> the value case and funding decision.</div></div>
+    <div class="card hot r pop sheen" style="--d:4"><div class="lab">Operating ownership</div><h3>LOB leader + COO</h3><p>Own the workflow, redesign handoffs, train users, define human gates and track realized results.</p><div class="foot"><b>Own:</b> the outcome, adoption and exception path.</div></div>
+    <div class="card hot r pop sheen" style="--d:5"><div class="lab">Technology &amp; controls</div><h3>CIO + CTO</h3><p>Ensure data readiness and access; choose architecture, integrations, evaluation and operations.</p><div class="foot"><b>Own:</b> a reliable, supportable implementation.</div></div>
+  </div>
+  <div class="callout r" style="--d:8"><b>Coordinate without diluting ownership.</b> An AI Center of Excellence provides shared patterns, skilling and governance. Business owners remain responsible for results.</div>
+</section>
+
+<section class="scene" data-fx="slide" data-ch="Execution" data-theme="#7C4FE0,#F25022,#f0abfc"
+ data-say="Run a bounded pilot with real work. Write the outcome charter. Set the boundary for what AI may do. Then learn with the users. Start narrow enough to learn, and meaningful enough to matter.">
+  <div class="kick r">A testable investment</div>
+  <h2 class="r" style="--d:1">Run a bounded pilot <span class="g">with real work</span></h2>
+  <div class="journey">
+    <div class="stp r" style="--d:3"><div class="dot">✎</div><div class="when">Before launch</div><h3>Write the outcome charter</h3><p>Define the workflow, users, baseline, expected benefit, budget and pilot duration.</p><span class="prod">Output: charter + baseline scorecard</span></div>
+    <div class="stp r" style="--d:5"><div class="dot">⛨</div><div class="when">Set the boundary</div><h3>Decide what AI may do</h3><p>Approve knowledge, tools, access and permitted actions. Specify human gates, stop conditions and fallback.</p><span class="prod">Output: access plan, eval set, controls</span></div>
+    <div class="stp r" style="--d:7"><div class="dot">↻</div><div class="when">In the workflow</div><h3>Learn with the users</h3><p>Redesign handoffs, teach verification, test representative cases and capture failures and feedback.</p><span class="prod">Output: readout on outcomes, quality, cost</span></div>
+  </div>
+  <div class="callout r" style="--d:9"><b>Keep the pilot reversible.</b> Route uncertain or consequential actions to a named person, and keep a workable non-AI path.</div>
+</section>
+
+<section class="scene" data-fx="zoom" data-ch="Execution" data-theme="#7C4FE0,#F25022,#f0abfc"
+ data-say="Measure outcomes, not AI activity. Did performance improve? Was the result trustworthy? Did work actually change? And was it worth the full cost? A faster draft is not a saving if review, failures, or operating costs absorb the benefit.">
+  <div class="kick r">Evidence before expansion</div>
+  <h2 class="r" style="--d:1">Measure outcomes, <span class="g">not AI activity</span></h2>
+  <div class="row c4">
+    <div class="card r pop sheen" style="--d:3"><div class="lab">Business result</div><h3>Did performance improve?</h3><p>Cycle time, quality, customer or employee experience, and the business outcome.</p></div>
+    <div class="card r pop sheen" style="--d:4"><div class="lab">Reliability &amp; control</div><h3>Was it trustworthy?</h3><p>Errors, rework, escalations, approval failures and exception handling.</p></div>
+    <div class="card r pop sheen" style="--d:5"><div class="lab">Adoption &amp; capacity</div><h3>Did work change?</h3><p>Sustained use, feedback, changed handoffs and where freed capacity went.</p></div>
+    <div class="card r pop sheen" style="--d:6"><div class="lab">Full economics</div><h3>Was it worth the cost?</h3><p>Licenses, usage, integration, data prep, human review, training, support, monitoring.</p></div>
+  </div>
+  <div class="callout r" style="--d:8"><b>Use cost per successful task</b> alongside business outcomes. A faster draft is not a saving if review, failures or operating costs absorb the benefit.</div>
+</section>
+
+<section class="scene dec" data-fx="flip" data-ch="The Decision" data-theme="#7FBA00,#FFB900,#F25022"
+ data-say="Then make the leadership decision. Scale, when the case holds. Revise, when the gap is fixable. Or stop, when the case fails. The goal is not more AI in more places. It's better business outcomes through connected work, useful context, and accountable execution.">
+  <div class="kick r">The leadership decision</div>
+  <h2 class="r" style="--d:1">Scale. Revise. <span class="g">Or stop.</span></h2>
+  <div class="row c3">
+    <div class="card r pop" style="--d:3"><div class="verb">Scale</div><h3>Fund the operating model</h3><p>Outcomes, reliability, adoption and economics meet the agreed bar. Controls and service ownership are ready.</p><div class="foot"><b>Next:</b> expand in stages, reuse patterns, re-evaluate new access or autonomy.</div></div>
+    <div class="card r pop" style="--d:5"><div class="verb">Revise</div><h3>Change the design</h3><p>A credible value case, but data, handoffs, controls or user experience need work.</p><div class="foot"><b>Next:</b> narrow scope, fix the constraint, retest at a defined review point.</div></div>
+    <div class="card r pop" style="--d:7"><div class="verb">Stop</div><h3>Protect the investment</h3><p>Benefits don't justify full cost, unacceptable risk remains, or the workflow doesn't improve.</p><div class="foot"><b>Next:</b> retire safely, preserve lessons, redirect effort.</div></div>
+  </div>
+  <div class="callout r" style="--d:9"><b>The goal is not more AI in more places.</b> It is better business outcomes through connected work, useful context and accountable execution.</div>
+</section>
+
+<section class="scene" data-fx="iris" data-ch="Explore" data-theme="#00A4EF,#7C4FE0,#22d3ee"
+ data-say="The advantage isn't the model. It's the platform. Explore the Microsoft AI platform, and let's build your path together.">
+  <div class="brand r"><span class="mslogo"><i style="background:#F25022"></i><i style="background:#7FBA00"></i><i style="background:#00A4EF"></i><i style="background:#FFB900"></i></span>Microsoft</div>
+  <h1 class="r" style="--d:1;font-size:92px">The advantage isn't the model.<br><span class="g">It's the platform.</span></h1>
+  <div class="links">
+    <a class="r pop" style="--d:4" href="https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/" target="_blank" rel="noopener">Microsoft Work IQ ↗</a>
+    <a class="r pop" style="--d:5" href="https://learn.microsoft.com/en-us/fabric/fundamentals/microsoft-fabric-overview" target="_blank" rel="noopener">Microsoft Fabric &amp; Fabric IQ ↗</a>
+    <a class="r pop" style="--d:6" href="https://learn.microsoft.com/en-us/azure/foundry/what-is-foundry" target="_blank" rel="noopener">Microsoft Foundry &amp; Foundry IQ ↗</a>
+    <a class="r pop" style="--d:7" href="https://learn.microsoft.com/en-us/microsoft-agent-365/" target="_blank" rel="noopener">Microsoft Agent 365 ↗</a>
+    <a class="r pop" style="--d:8" href="https://learn.microsoft.com/en-us/dynamics365/sales/ai-agent-overview" target="_blank" rel="noopener">Dynamics 365 AI Capabilities ↗</a>
+    <a class="r pop" style="--d:9" href="https://learn.microsoft.com/en-us/microsoftteams/teams-overview" target="_blank" rel="noopener">Microsoft Teams ↗</a>
+    <a class="r pop" style="--d:10" href="https://docs.github.com/en/copilot/get-started/what-is-github-copilot" target="_blank" rel="noopener">GitHub Copilot ↗</a>
+    <a class="r pop" style="--d:11" href="https://learn.microsoft.com/en-us/azure/" target="_blank" rel="noopener">Microsoft Azure ↗</a>
+  </div>
+  <p class="note r" style="--d:12">© 2026 Microsoft Corporation. All rights reserved.</p>
+</section>
+
+</div></div>
+
+<div class="menu" id="menu" role="menu"></div>
+<div class="hud">
+  <div class="cap" id="cap" aria-live="polite"></div>
+  <div class="ctl">
+    <button id="prev" type="button" aria-label="Previous">‹</button>
+    <button id="pp" type="button" aria-label="Pause">❚❚</button>
+    <button id="next" type="button" aria-label="Next">›</button>
+    <span class="chap" id="chap"></span>
+    <div class="prog" id="prog"></div>
+    <span class="cnt" id="cnt"></span>
+    <button id="voice" type="button" class="on">🔊</button>
+    <button id="cc" type="button" class="on">CC</button>
+    <button id="auto" type="button" class="on" title="Auto-advance">Auto</button>
+    <button id="menuBtn" type="button" title="Chapters">☰</button>
+    <button id="fs" type="button" title="Full screen">⛶</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var deck=document.getElementById('deck'), scenes=[].slice.call(deck.querySelectorAll('.scene'));
+  var prog=document.getElementById('prog'), cap=document.getElementById('cap'), cnt=document.getElementById('cnt'), chap=document.getElementById('chap');
+  var pp=document.getElementById('pp'), vBtn=document.getElementById('voice'), ccBtn=document.getElementById('cc'), autoBtn=document.getElementById('auto');
+  var menu=document.getElementById('menu'), flash=document.getElementById('flash'), toast=document.getElementById('toast');
+  var idx=-1, playing=false, autoOn=true, voiceOn=true, ccOn=true, started=false;
+  var t0=0, elapsed=0, dur=0, raf=0, synth=window.speechSynthesis||null, voice=null, timers=[];
+
+  /* ---------- scale stage to viewport (no scrolling) ---------- */
+  function fit(){
+    var s=Math.min((window.innerWidth-32)/1600,(window.innerHeight-20)/900);
+    deck.style.transform='translate(-50%,-50%) scale('+s+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  /* ---------- background particles ---------- */
+  var cv=document.getElementById('fx'), ctx=cv.getContext('2d'), P=[], W=0,H=0, col=[[0,164,239],[124,79,224]], tcol=col.slice(), boost=0;
+  function rs(){ W=cv.width=window.innerWidth*devicePixelRatio; H=cv.height=window.innerHeight*devicePixelRatio; }
+  window.addEventListener('resize',rs); rs();
+  for(var i=0;i<110;i++){ P.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.0006,vy:(Math.random()-.5)*.0006,r:Math.random()*1.8+.6,k:Math.random()}); }
+  function hex(h){ h=h.replace('#',''); return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]; }
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  var bh=0, bhT=0, bhAng=0, bhX=null, bhY=null;
+  for(var q=0;q<P.length;q++){ P[q].a=1; P[q].ox=P[q].x; P[q].oy=P[q].y; }
+  function respawn(p){
+    var side=Math.floor(Math.random()*4), t=Math.random();
+    if(side===0){p.x=t;p.y=-.02;} else if(side===1){p.x=1.02;p.y=t;} else if(side===2){p.x=t;p.y=1.02;} else {p.x=-.02;p.y=t;}
+    p.ox=p.x; p.oy=p.y; p.a=0;
+  }
+  function draw(){
+    for(var c=0;c<2;c++) for(var j=0;j<3;j++) col[c][j]=lerp(col[c][j],tcol[c][j],.03);
+    boost*=.95; bh+=(bhT-bh)*.025; bhAng+=.012;
+    ctx.clearRect(0,0,W,H);
+    var sp=1+boost*14, dpr=devicePixelRatio, cx=W/2, cy=H/2;
+    var an=idx>=0?scenes[idx].querySelector('.bh-anchor'):null;
+    if(an){ var rc=an.getBoundingClientRect(); bhX=(rc.left+rc.width/2)*dpr; bhY=(rc.top+rc.height/2)*dpr; }
+    if(bhX!==null){ cx=bhX; cy=bhY; }
+    for(var i=0;i<P.length;i++){
+      var p=P[i]; p.ox=p.x; p.oy=p.y;
+      p.x+=p.vx*sp*(1-bh); p.y+=p.vy*sp*(1-bh);
+      if(boost>.05 && bhT===0){ p.x+=(p.x-.5)*.004*boost; p.y+=(p.y-.5)*.004*boost; }
+      if(bh>.01){
+        var px=p.x*W, py=p.y*H, dx=cx-px, dy=cy-py, d=Math.sqrt(dx*dx+dy*dy)+.001, dd=d/dpr;
+        var vr=bh*(.35+260/(dd+30)), vt=bh*(.25+620/(dd+45));
+        px+=(dx/d*vr - dy/d*vt)*dpr; py+=(dy/d*vr + dx/d*vt)*dpr;
+        p.x=px/W; p.y=py/H;
+        if(dd<6*bh+3 && bhT>0) respawn(p);
+      }
+      if(p.a<1) p.a=Math.min(1,p.a+.02);
+      if(bh<.5){ if(p.x<0){p.x+=1;p.ox=p.x;} if(p.x>1){p.x-=1;p.ox=p.x;} if(p.y<0){p.y+=1;p.oy=p.y;} if(p.y>1){p.y-=1;p.oy=p.y;} }
+    }
+    var lim=(150+60*bh)*dpr;
+    for(var a=0;a<P.length;a++){
+      var A=P[a], ca=A.k<.5?col[0]:col[1], rgb=(ca[0]|0)+','+(ca[1]|0)+','+(ca[2]|0);
+      for(var b=a+1;b<P.length;b++){
+        var B=P[b], ex=(A.x-B.x)*W, ey=(A.y-B.y)*H, e=Math.sqrt(ex*ex+ey*ey);
+        if(e<lim){ ctx.strokeStyle='rgba('+rgb+','+(1-e/lim)*.28*Math.min(A.a,B.a)+')'; ctx.lineWidth=dpr*.8; ctx.beginPath(); ctx.moveTo(A.x*W,A.y*H); ctx.lineTo(B.x*W,B.y*H); ctx.stroke(); }
+      }
+      if(bh>.05){
+        ctx.strokeStyle='rgba('+rgb+','+.55*bh*A.a+')'; ctx.lineWidth=A.r*dpr*1.4; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(A.ox*W-(A.x-A.ox)*W*3,A.oy*H-(A.y-A.oy)*H*3); ctx.lineTo(A.x*W,A.y*H); ctx.stroke();
+      }
+      ctx.fillStyle='rgba('+rgb+','+.9*A.a+')';
+      ctx.beginPath(); ctx.arc(A.x*W,A.y*H,A.r*dpr*(1+boost),0,6.283); ctx.fill();
+    }
+    if(bh>.01){
+      var R=6*dpr*bh, c0=col[0], c1=col[1];
+      var halo=ctx.createRadialGradient(cx,cy,R*.9,cx,cy,R*5);
+      halo.addColorStop(0,'rgba('+(c1[0]|0)+','+(c1[1]|0)+','+(c1[2]|0)+','+.55*bh+')');
+      halo.addColorStop(.25,'rgba('+(c0[0]|0)+','+(c0[1]|0)+','+(c0[2]|0)+','+.22*bh+')');
+      halo.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(cx,cy,R*5,0,6.283); ctx.fill();
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(-.35);
+      for(var k=0;k<3;k++){
+        ctx.save(); ctx.scale(1,.28); ctx.rotate(bhAng*(1+k*.6));
+        var g=ctx.createLinearGradient(-R*3.4,0,R*3.4,0);
+        g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(.5,'rgba(255,230,200,'+.5*bh+')'); g.addColorStop(1,'rgba('+(c0[0]|0)+','+(c0[1]|0)+','+(c0[2]|0)+','+.6*bh+')');
+        ctx.strokeStyle=g; ctx.lineWidth=(1.6-k*.4)*dpr; ctx.beginPath(); ctx.arc(0,0,R*(2.1+k*.6),0,6.283); ctx.stroke(); ctx.restore();
+      }
+      ctx.restore();
+      ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,6.283); ctx.fill();
+      ctx.strokeStyle='rgba(255,240,220,'+.85*bh+')'; ctx.lineWidth=1*dpr; ctx.shadowColor='rgba(255,220,180,'+bh+')'; ctx.shadowBlur=10*dpr;
+      ctx.beginPath(); ctx.arc(cx,cy,R*1.06,0,6.283); ctx.stroke(); ctx.shadowBlur=0;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  /* ---------- theme per scene ---------- */
+  var root=document.documentElement;
+  function theme(s){
+    var t=(s.getAttribute('data-theme')||'#00A4EF,#7C4FE0,#22d3ee').split(',');
+    root.style.setProperty('--c1',t[0]); root.style.setProperty('--c2',t[1]); root.style.setProperty('--c3',t[2]);
+    tcol=[hex(t[0]),hex(t[1])];
+  }
+
+  /* ---------- progress + menu ---------- */
+  var lastCh='';
+  scenes.forEach(function(s,i){
+    var sp=document.createElement('span'); sp.appendChild(document.createElement('i')); sp.title=(i+1)+' · '+s.getAttribute('data-ch');
+    sp.addEventListener('click',function(){ go(i); }); prog.appendChild(sp);
+    var ch=s.getAttribute('data-ch');
+    if(ch!==lastCh){ var h=document.createElement('h4'); h.textContent=ch; menu.appendChild(h); lastCh=ch; }
+    var b=document.createElement('button'); b.type='button';
+    var em=document.createElement('em'); em.textContent=(i+1); b.appendChild(em);
+    var h2=s.querySelector('h1,h2'); b.appendChild(document.createTextNode(h2?h2.textContent.replace(/\s+/g,' ').trim():ch));
+    b.addEventListener('click',function(){ menu.classList.remove('open'); go(i); }); menu.appendChild(b);
+  });
+  document.getElementById('menuBtn').addEventListener('click',function(){ menu.classList.toggle('open'); });
+
+  function bar(){
+    var sp=prog.children;
+    for(var i=0;i<sp.length;i++){ sp[i].className=i<idx?'done':''; sp[i].firstChild.style.width=i<idx?'100%':'0%'; }
+    cnt.textContent=(idx+1)+' / '+scenes.length; chap.textContent=scenes[idx].getAttribute('data-ch');
+    var mb=menu.querySelectorAll('button'); for(var j=0;j<mb.length;j++) mb[j].classList.toggle('cur',j===idx);
+  }
+
+  /* ---------- scene effects: counters, bars, ring ---------- */
+  function clearT(){ timers.forEach(clearTimeout); timers=[]; }
+  function counters(s){
+    [].forEach.call(s.querySelectorAll('[data-count]'),function(el){
+      var to=parseFloat(el.getAttribute('data-count')), dec=+(el.getAttribute('data-dec')||0), pre=el.getAttribute('data-pre')||'', suf=el.getAttribute('data-suf')||'';
+      el.textContent=pre+(0).toFixed(dec)+suf;
+      var holder=el.closest('.r'), d=holder?parseFloat(getComputedStyle(holder).getPropertyValue('--d'))||0:0;
+      timers.push(setTimeout(function(){
+        var st=performance.now(), D=1600;
+        (function f(now){ var t=Math.min(1,(now-st)/D), e=1-Math.pow(1-t,3); el.textContent=pre+(to*e).toFixed(dec)+suf; if(t<1&&s.classList.contains('active')) requestAnimationFrame(f); else el.textContent=pre+to.toFixed(dec)+suf; })(st);
+      }, d*220+700));
+    });
+  }
+  function fills(s){
+    [].forEach.call(s.querySelectorAll('.fill'),function(f){ f.style.width='0'; });
+    timers.push(setTimeout(function(){ [].forEach.call(s.querySelectorAll('.fill'),function(f){ f.style.width=f.getAttribute('data-w')+'%'; }); },1500));
+    var ring=s.querySelector('circle.p');
+    if(ring){ ring.style.strokeDasharray='0 1000'; timers.push(setTimeout(function(){ ring.style.strokeDasharray=(2*Math.PI*52*.61)+' 1000'; },900)); }
+  }
+
+  /* ---------- narration ---------- */
+  function pickVoice(){
+    if(!synth) return; var vs=synth.getVoices();
+    var pref=['Microsoft Andrew Online','Microsoft Ava Online','Microsoft Aria Online','Microsoft Guy Online','Microsoft Jenny Online','Microsoft Aria','Microsoft Zira','Google US English','Samantha'];
+    for(var p=0;p<pref.length;p++) for(var v=0;v<vs.length;v++) if(vs[v].name.indexOf(pref[p])===0){ voice=vs[v]; return; }
+    for(var k=0;k<vs.length;k++) if(/^en/i.test(vs[k].lang)){ voice=vs[k]; return; }
+  }
+  if(synth){ pickVoice(); synth.addEventListener&&synth.addEventListener('voiceschanged',pickVoice); }
+  function speak(t){
+    if(!synth||!voiceOn) return; synth.cancel();
+    var u=new SpeechSynthesisUtterance(t); if(voice) u.voice=voice; u.rate=1.03;
+    synth.speak(u);
+  }
+  function durFor(t,s){ var w=t.split(/\s+/).length, rv=s.querySelectorAll('.r').length; return Math.max(9000, w*390+2500, rv*220+4500); }
+
+  /* ---------- navigation ---------- */
+  function go(i){
+    if(i<0||i>=scenes.length||i===idx) return;
+    var back=i<idx; deck.classList.toggle('back',back);
+    var prev=idx>=0?scenes[idx]:null, s=scenes[i];
+    clearT(); cancelAnimationFrame(raf);
+    if(prev){ prev.classList.remove('active'); prev.classList.add('leaving'); setTimeout(function(){ prev.classList.remove('leaving'); },800); }
+    var chChange=!prev||prev.getAttribute('data-ch')!==s.getAttribute('data-ch');
+    idx=i; theme(s); boost=1; bhT=s.hasAttribute('data-bh')?1:0;
+    if(chChange){ flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go'); toast.textContent=s.getAttribute('data-ch'); toast.classList.add('show'); setTimeout(function(){ toast.classList.remove('show'); },2200); }
+    setTimeout(function(){ void s.offsetWidth; s.classList.add('active'); counters(s); fills(s); }, prev?320:0);
+    var t=s.getAttribute('data-say')||''; cap.textContent=ccOn?t:'';
+    dur=durFor(t,s); elapsed=0; t0=performance.now(); bar();
+    if(playing){ speak(t); raf=requestAnimationFrame(tick); } else if(synth) synth.cancel();
+  }
+  function tick(){
+    if(!playing) return;
+    var e=elapsed+(performance.now()-t0);
+    prog.children[idx].firstChild.style.width=Math.min(100,e/dur*100)+'%';
+    if(autoOn && e>=dur && !(voiceOn&&synth&&synth.speaking)){ if(idx<scenes.length-1){ go(idx+1); return; } setPlay(false); return; }
+    raf=requestAnimationFrame(tick);
+  }
+  function setPlay(p){
+    playing=p; pp.textContent=p?'❚❚':'▶'; pp.setAttribute('aria-label',p?'Pause':'Play');
+    if(p){ t0=performance.now(); if(synth&&voiceOn){ if(synth.paused) synth.resume(); else speak(scenes[idx].getAttribute('data-say')); } raf=requestAnimationFrame(tick); }
+    else { elapsed+=performance.now()-t0; cancelAnimationFrame(raf); if(synth) synth.pause(); }
+  }
+  function next(){ go(Math.min(idx+1,scenes.length-1)); }
+  function prevS(){ go(Math.max(idx-1,0)); }
+
+  document.getElementById('next').addEventListener('click',next);
+  document.getElementById('prev').addEventListener('click',prevS);
+  pp.addEventListener('click',function(){ setPlay(!playing); });
+  vBtn.addEventListener('click',function(){ voiceOn=!voiceOn; vBtn.classList.toggle('on',voiceOn); vBtn.textContent=voiceOn?'🔊':'🔇'; if(!voiceOn&&synth) synth.cancel(); else if(playing) speak(scenes[idx].getAttribute('data-say')); });
+  ccBtn.addEventListener('click',function(){ ccOn=!ccOn; ccBtn.classList.toggle('on',ccOn); cap.textContent=ccOn?scenes[idx].getAttribute('data-say'):''; });
+  autoBtn.addEventListener('click',function(){ autoOn=!autoOn; autoBtn.classList.toggle('on',autoOn); });
+  document.getElementById('fs').addEventListener('click',function(){ if(!document.fullscreenElement&&document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); else if(document.exitFullscreen) document.exitFullscreen(); });
+  document.addEventListener('keydown',function(e){
+    if(!started) return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'){ e.preventDefault(); next(); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); prevS(); }
+    else if(e.key===' '){ e.preventDefault(); setPlay(!playing); }
+    else if(e.key==='m'||e.key==='M'){ menu.classList.toggle('open'); }
+    else if(e.key==='Escape'){ menu.classList.remove('open'); }
+  });
+  /* swipe */
+  var sx=null; document.addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',function(e){ if(sx===null) return; var dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>50){ dx<0?next():prevS(); } sx=null; });
+
+  function begin(mode){
+    started=true;
+    voiceOn=(mode==='voice')&&!!synth; vBtn.classList.toggle('on',voiceOn); vBtn.textContent=voiceOn?'🔊':'🔇';
+    autoOn=mode!=='manual'; autoBtn.classList.toggle('on',autoOn);
+    if(mode==='manual'){ ccOn=false; ccBtn.classList.remove('on'); }
+    document.getElementById('gate').classList.add('hide');
+    playing=true; pp.textContent='❚❚';
+    go(0);
+  }
+  document.getElementById('start').addEventListener('click',function(){ begin('voice'); });
+  document.getElementById('startSilent').addEventListener('click',function(){ begin('silent'); });
+  document.getElementById('startManual').addEventListener('click',function(){ begin('manual'); });
+})();
+</script>
+</body>
+</html>
